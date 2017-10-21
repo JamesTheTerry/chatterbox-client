@@ -42,6 +42,16 @@ var app = {
       this.fetch();
     });
     
+    $('#createNewRoom').on('click', (e) => {
+      var newRoomName = $('#newRoomName').val();
+      if (this.rooms.indexOf(newRoomName) === -1 && newRoomName) {
+        this.rooms.push(newRoomName);
+        var html = `<option name=${newRoomName}>${newRoomName}</option>`;
+        $('#roomSelect').append(html);
+      }        
+      $('#newRoomName').val('');
+    });
+    
   },
   
   fetch: function() {
@@ -49,10 +59,7 @@ var app = {
     $.ajax({
       type: 'GET',
       success: data => {
-        data.results.forEach(message => {
-          this.findRooms(message);
-        });
-        this.addRooms();
+        this.addRooms(data.results);
         var currentRoom = $('#roomSelect').val();
         var messages = data.results.filter(val => {
           return val.roomname === currentRoom;
@@ -64,29 +71,29 @@ var app = {
     });
   },
   
-  addRooms: function() {
+  addRooms: function(messages) {
     var html = '';
-    this.rooms.forEach(room => {
-      html += `<option name=${room}>${room}</option>`;
-      this.rooms.push(room);
+    messages.forEach(message => {
+      if (this.rooms.indexOf(message.roomname) === -1 && message.roomname) {
+        this.rooms.push(message.roomname);
+        html += `<option name=${message.roomname}>${message.roomname}</option>`;
+      }
     });
-    $('#roomSelect').append(html);
-  },
-  
-  findRooms: function(message) {
-    if (this.rooms.indexOf(message.roomname) === -1 && message.roomname) {
-      this.rooms.push(message.roomname);
+    if (html === '') {
+      return null;
     }
+    $('#roomSelect').append(html);  
   },
   
   
   createMessage: function(text) {
     var url = new URL(window.location.href);
     var username = url.searchParams.get('username');
+    var room = $('#roomSelect').val();
     var message = {
       username: 'chris',
       text,
-      roomname: ''
+      roomname: room
     };
     return message;
   },
@@ -95,7 +102,7 @@ var app = {
     console.log('sendMSG', message);
     $.ajax({
       type: 'POST',
-      data: message,
+      data: JSON.stringify(message),
       success: function (data) {
         console.log('chatterbox: Message sent');
       },
