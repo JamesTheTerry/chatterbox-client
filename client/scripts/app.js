@@ -37,18 +37,13 @@ var app = {
   },
   
   addRooms: function(messages) {
-    var html = '';
-    messages.forEach(message => {
+    messages.forEach((message, i) => {
       if (this.rooms.indexOf(message.roomname) === -1 && message.roomname) {
         this.rooms.push(message.roomname);
-        // get the bottom child, use it to safely set the room name
-        html += `<option id="">${message.roomname}</option>`;
+        $('#roomSelect').append(`<option id=${this.rooms.length - 1} class="room"></option>`);
+        $(`#${this.rooms.length - 1}`).text(message.roomname);
       }
-    });
-    if (html === '') {
-      return null;
-    }
-    $('#roomSelect').append(html);  
+    });      
   },
   
   
@@ -85,18 +80,20 @@ var app = {
   
   //this.rooms.indexOf(newRoomName) === -1
   renderMessage: function(message) {
-    var classes = 'username';
+    var usernameClasses = 'username';
+    var messageClasses = 'contents';
     if (this.friends.indexOf(message.username) !== -1) {
-      classes += ' friend';
+      usernameClasses += ' friend';
+      messageClasses += ' friendMessage';
     }
     
-    var html = `<div class="messageContainer">
-    <div class="${classes}"></div>
-    <div class="contents"></div>
+    var html = `<div id=${message.objectId} class="messageContainer">
+    <div class="${usernameClasses}"></div>
+    <div class="${messageClasses}"></div>
     </div>`;
     $('#chats').append(html);
-    $('.username').text(message.username);
-    $('.contents').text(message.text);
+    $(`#${message.objectId} .username`).text(message.username);
+    $(`#${message.objectId} .contents`).text(message.text);
   },
   
   renderRoom: function(room) {
@@ -149,9 +146,9 @@ var app = {
       var newRoomName = $('#newRoomName').val();
       if (this.rooms.indexOf(newRoomName) === -1 && newRoomName) {
         this.rooms.push(newRoomName);
-        var html = `<option name=${newRoomName}>${newRoomName}</option>`;
-        $('#roomSelect').append(html);
-      }        
+        $('#roomSelect').append(`<option id='${this.rooms.length - 1}'></option>`);
+        $(`#${this.rooms.length - 1}`).text(newRoomName);
+      }
       $('#newRoomName').val('');
     });
   }

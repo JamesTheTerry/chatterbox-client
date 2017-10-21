@@ -83,17 +83,6 @@ form input[type=text] {
     padding: 10px;
 }
 
-.friend {
-    color: #fff;
-    background-color: #0090da;
-}
-
-.messageContainer {
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid rgb(225, 225, 225);
-}
-
 .username {
   margin-bottom: 5px;
   color: rgb(51, 153, 204);
@@ -106,4 +95,21 @@ form input[type=text] {
   cursor: pointer;
   text-decoration-color: rgb(51, 153, 204);
 }
+
+.friend {
+    color: #4CAF50;
+    /*background-color: #0090da;*/
+}
+
+.friendMessage {
+    font-weight: 800;
+}
+
+.messageContainer {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid rgb(225, 225, 225);
+}
+
+
 
