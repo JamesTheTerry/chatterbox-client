@@ -60,7 +60,6 @@ var app = {
   },
   
   send: function(message) {
-    console.log('sendMSG', message);
     $.ajax({
       type: 'POST',
       data: JSON.stringify(message),
@@ -101,7 +100,8 @@ var app = {
     $('#roomSelect').append(html);
   },
   
-  handleSubmit: function() {
+  handleSubmit: function(e) {
+    e.preventDefault();
     var message = this.createMessage($('#messageInput').val());
     this.send(message);
     $('#message').val('');
@@ -121,7 +121,14 @@ var app = {
   addEventHandlers: function() {
     $('#message').on('keydown', (e) => {
       if (e.keyCode === 13) {
-        var message = this.createMessage(e.target.value); 
+        var url = new URL(window.location.href);
+        var username = url.searchParams.get('username');
+        var room = $('#roomSelect').val();
+        var message = {
+          username: username,
+          text: e.target.value,
+          roomname: room
+        };
         console.log(message);       
         this.send(message);
         $('#message').val('');
@@ -132,10 +139,7 @@ var app = {
       this.handleUsernameClick(e);
     });
     
-    $('#send .submit').on('submit', (e) => {
-      e.preventDefault();
-      this.handleSubmit(e);
-    });
+    $('#send').submit(this.handleSubmit.bind(this));
     
     $('#roomSelect').on('change', (e) => {
       $('#chats').empty();
@@ -148,6 +152,9 @@ var app = {
         this.rooms.push(newRoomName);
         $('#roomSelect').append(`<option id='${this.rooms.length - 1}'></option>`);
         $(`#${this.rooms.length - 1}`).text(newRoomName);
+        
+        // this can be hacked
+        // $('#roomSelect').append(`<option id='${this.rooms.length - 1}'>${newRoomName}</option>`);
       }
       $('#newRoomName').val('');
     });
