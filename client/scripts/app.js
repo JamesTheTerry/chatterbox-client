@@ -12,8 +12,8 @@ var app = {
   
   init: function() {
     $.ajaxSetup({
-      url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
-      contentType: 'application/json'
+      url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages'
+      // contentType: 'application/json'
     });
     this.fetch();
     this.addEventHandlers(); 
@@ -62,7 +62,7 @@ var app = {
   send: function(message) {
     $.ajax({
       type: 'POST',
-      data: JSON.stringify(message),
+      data: message,
       success: function (data) {
         console.log('chatterbox: Message sent');
       },
