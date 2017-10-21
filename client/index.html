@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>chatterbox</title>
     <link rel="stylesheet" href="styles/styles.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Space+Mono" rel="stylesheet">
 
     <!-- dependencies -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -25,23 +26,30 @@
     <script src="scripts/app.js"></script>
   </head>
   <body>
-    <div id="main">
-      <h1>chatterbox</h1>
-      <div style='margin-bottom: 30px;'>
-        Room
-        <select id="roomSelect">
-          <option name=''></option>
-        </select>
-        <input type='text' name='newRoomName' id='newRoomName' /> 
-        <button id='createNewRoom'>Create New Room</button>
+    <nav class="navbar">
+      <h4 class="logo">chatterbox</h4>
+      <button class="addroom">Add Room</button>
+    </nav>
+    <div class="roomContainer">
+        <div>
+          Room
+          <select id="roomSelect">
+            <option name=''></option>
+          </select>
+          <input type='text' name='newRoomName' id='newRoomName' /> 
+          <button id='createNewRoom'>Create New Room</button>
+        </div>
       </div>
-      <!-- <button id="fetchMessages">Fetch Messages</button> -->
-      <input type="text" name="messageInput" id="message"></input>
-      <form id="send" class="submit">
-        <input class="submit" type="submit"></input>
-      </form>
+    <div id="main">
+      <div class="chatsContainer">
+        <div id="chats"></div>
+      </div>
+      <div class="inputContainer">
+        <form id="send" class="submit">
+          <input type="text" name="messageInput" id="message"></input>
+          <input class="submit" type="submit"></input>
+        </form>
+      </div>
     </div>
-    
-    <div id="chats"></div>
   </body>
 </html>

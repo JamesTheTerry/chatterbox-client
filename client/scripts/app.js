@@ -88,12 +88,14 @@ var app = {
     }
     
     var html = `<div id=${message.objectId} class="messageContainer">
-    <div class="time">${moment(message.createdAt).format('MM/DD hh:mma')}</div>
-    <div class="${usernameClasses}"></div>
+    <div class="usernameContainer">
+      <div class="${usernameClasses}"></div>
+      <div class="time">${moment(message.timeCreatedAt).format('hh:mma')}</div>
+    </div>
     <div class="${messageClasses}"></div>
     </div>`;
-    $('#chats').append(html);
-    $(`#${message.objectId} .username`).text(message.username);
+    $('#chats').prepend(html);
+    $(`#${message.objectId} .username`).text(message.username || 'literally noone');
     $(`#${message.objectId} .contents`).text(message.text);
   },
   
@@ -104,9 +106,14 @@ var app = {
   
   handleSubmit: function(e) {
     e.preventDefault();
-    var message = this.createMessage($('#messageInput').val());
+    if ($('#message').val().length === 0) {
+      return;
+    }
+    var message = this.createMessage($('#message').val());
     this.send(message);
     $('#message').val('');
+    $('#chats').empty();
+    this.fetch();
   },
   
   handleUsernameClick: function(e) {
@@ -121,21 +128,22 @@ var app = {
   },
   
   addEventHandlers: function() {
-    $('#message').on('keydown', (e) => {
-      if (e.keyCode === 13) {
-        var url = new URL(window.location.href);
-        var username = url.searchParams.get('username');
-        var room = $('#roomSelect').val();
-        var message = {
-          username: username,
-          text: e.target.value,
-          roomname: room
-        };
-        console.log(message);       
-        this.send(message);
-        $('#message').val('');
-      }
-    });
+    // $('#message').on('keydown', (e) => {
+    //   // console.log($('#message').val());
+    //   if (e.keyCode === 13 && $('#message').val().length > 0) {
+    //     var url = new URL(window.location.href);
+    //     var username = url.searchParams.get('username');
+    //     var room = $('#roomSelect').val();
+    //     var message = {
+    //       username: username,
+    //       text: e.target.value,
+    //       roomname: room
+    //     };
+    //     console.log(message);       
+    //     this.send(message);
+    //     $('#message').val('');
+    //   }
+    // });
     
     $('#chats').on('click', '.username', (e) => {
       this.handleUsernameClick(e);
