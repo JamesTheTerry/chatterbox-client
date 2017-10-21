@@ -117,9 +117,14 @@ var app = {
     $('#chats').empty();
   },
   
+  //this.rooms.indexOf(newRoomName) === -1
   renderMessage: function(message) {
+    var classes = 'username';
+    if (this.friends.indexOf(message.username) !== -1) {
+      classes += ' friend';
+    }
     var html = `<div class="messageContainer">
-    <div class="username">${message.username}</div>
+    <div class="${classes}">${message.username}</div>
     <div class="contents">${message.text}</div>
     </div>`;
     $('#chats').append(html);
@@ -140,6 +145,10 @@ var app = {
     if (this.friends.indexOf(e.target.innerText) === -1) {
       this.friends.push(e.target.innerText);
       console.log(this.friends); 
+      console.log(e.target);
+      $(e.target).addClass('friend');
+      $('#chats').empty();
+      this.fetch();
     }
   }
 };
