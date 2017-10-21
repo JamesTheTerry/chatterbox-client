@@ -16,9 +16,112 @@ var app = {
       contentType: 'application/json'
     });
     this.fetch();
+    this.addEventHandlers(); 
+  },
+  
+  fetch: function() {
+    // this.renderMessage = this.renderMessage.bind(this);
+    $.ajax({
+      type: 'GET',
+      success: data => {
+        this.addRooms(data.results);
+        var currentRoom = $('#roomSelect').val();
+        var messages = data.results.filter(val => {
+          return val.roomname === currentRoom;
+        });
+        messages.forEach(message => {
+          this.renderMessage(message);
+        });
+      }
+    });
+  },
+  
+  addRooms: function(messages) {
+    var html = '';
+    messages.forEach(message => {
+      if (this.rooms.indexOf(message.roomname) === -1 && message.roomname) {
+        this.rooms.push(message.roomname);
+        // get the bottom child, use it to safely set the room name
+        html += `<option id="">${message.roomname}</option>`;
+      }
+    });
+    if (html === '') {
+      return null;
+    }
+    $('#roomSelect').append(html);  
+  },
+  
+  
+  createMessage: function(text) {
+    var url = new URL(window.location.href);
+    var username = url.searchParams.get('username');
+    var room = $('#roomSelect').val();
+    var message = {
+      username: username,
+      text,
+      roomname: room
+    };
+    return message;
+  },
+  
+  send: function(message) {
+    console.log('sendMSG', message);
+    $.ajax({
+      type: 'POST',
+      data: JSON.stringify(message),
+      success: function (data) {
+        console.log('chatterbox: Message sent');
+      },
+      error: function (data) {
+        // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+        console.error('chatterbox: Failed to send message', data);
+      }
+    });
+  },
+  
+  clearMessages: function() {
+    $('#chats').empty();
+  },
+  
+  //this.rooms.indexOf(newRoomName) === -1
+  renderMessage: function(message) {
+    var classes = 'username';
+    if (this.friends.indexOf(message.username) !== -1) {
+      classes += ' friend';
+    }
     
-    // $('#fetchMessages').on('click', () => this.fetch());
-    
+    var html = `<div class="messageContainer">
+    <div class="${classes}"></div>
+    <div class="contents"></div>
+    </div>`;
+    $('#chats').append(html);
+    $('.username').text(message.username);
+    $('.contents').text(message.text);
+  },
+  
+  renderRoom: function(room) {
+    var html = `<option value=${room}>${room}</option>`;
+    $('#roomSelect').append(html);
+  },
+  
+  handleSubmit: function() {
+    var message = this.createMessage($('#messageInput').val());
+    this.send(message);
+    $('#message').val('');
+  },
+  
+  handleUsernameClick: function(e) {
+    if (this.friends.indexOf(e.target.innerText) === -1) {
+      this.friends.push(e.target.innerText);
+      console.log(this.friends); 
+      console.log(e.target);
+      $(e.target).addClass('friend');
+      $('#chats').empty();
+      this.fetch();
+    }
+  },
+  
+  addEventHandlers: function() {
     $('#message').on('keydown', (e) => {
       if (e.keyCode === 13) {
         var message = this.createMessage(e.target.value); 
@@ -51,104 +154,5 @@ var app = {
       }        
       $('#newRoomName').val('');
     });
-    
-  },
-  
-  fetch: function() {
-    // this.renderMessage = this.renderMessage.bind(this);
-    $.ajax({
-      type: 'GET',
-      success: data => {
-        this.addRooms(data.results);
-        var currentRoom = $('#roomSelect').val();
-        var messages = data.results.filter(val => {
-          return val.roomname === currentRoom;
-        });
-        messages.forEach(message => {
-          this.renderMessage(message);
-        });
-      }
-    });
-  },
-  
-  addRooms: function(messages) {
-    var html = '';
-    messages.forEach(message => {
-      if (this.rooms.indexOf(message.roomname) === -1 && message.roomname) {
-        this.rooms.push(message.roomname);
-        html += `<option name=${message.roomname}>${message.roomname}</option>`;
-      }
-    });
-    if (html === '') {
-      return null;
-    }
-    $('#roomSelect').append(html);  
-  },
-  
-  
-  createMessage: function(text) {
-    var url = new URL(window.location.href);
-    var username = url.searchParams.get('username');
-    var room = $('#roomSelect').val();
-    var message = {
-      username: 'chris',
-      text,
-      roomname: room
-    };
-    return message;
-  },
-  
-  send: function(message) {
-    console.log('sendMSG', message);
-    $.ajax({
-      type: 'POST',
-      data: JSON.stringify(message),
-      success: function (data) {
-        console.log('chatterbox: Message sent');
-      },
-      error: function (data) {
-        // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-        console.error('chatterbox: Failed to send message', data);
-      }
-    });
-  },
-  
-  clearMessages: function() {
-    $('#chats').empty();
-  },
-  
-  //this.rooms.indexOf(newRoomName) === -1
-  renderMessage: function(message) {
-    var classes = 'username';
-    if (this.friends.indexOf(message.username) !== -1) {
-      classes += ' friend';
-    }
-    var html = `<div class="messageContainer">
-    <div class="${classes}">${message.username}</div>
-    <div class="contents">${message.text}</div>
-    </div>`;
-    $('#chats').append(html);
-  },
-  
-  renderRoom: function(room) {
-    var html = `<option value=${room}>${room}</option>`;
-    $('#roomSelect').append(html);
-  },
-  
-  handleSubmit: function() {
-    var message = this.createMessage($('#messageInput').val());
-    this.send(message);
-    $('#message').val('');
-  },
-  
-  handleUsernameClick: function(e) {
-    if (this.friends.indexOf(e.target.innerText) === -1) {
-      this.friends.push(e.target.innerText);
-      console.log(this.friends); 
-      console.log(e.target);
-      $(e.target).addClass('friend');
-      $('#chats').empty();
-      this.fetch();
-    }
   }
 };
