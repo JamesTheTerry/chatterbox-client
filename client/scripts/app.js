@@ -23,6 +23,7 @@ var app = {
     // this.renderMessage = this.renderMessage.bind(this);
     $.ajax({
       type: 'GET',
+      data: 'order=-createdAt',
       success: data => {
         this.addRooms(data.results);
         var currentRoom = $('#roomSelect').val();
