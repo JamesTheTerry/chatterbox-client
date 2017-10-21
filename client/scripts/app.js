@@ -8,27 +8,40 @@ var app = {
   
   friends: [],
   
+  rooms: [],
+  
   init: function() {
     $.ajaxSetup({
       url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
       contentType: 'application/json'
     });
+    this.fetch();
     
-    $('#fetchMessages').on('click', () => this.fetch());
-    $('#messageInput').on('keydown', (e) => {
+    // $('#fetchMessages').on('click', () => this.fetch());
+    
+    $('#message').on('keydown', (e) => {
       if (e.keyCode === 13) {
-        // for accessing names in url window.location.href
-        // file:///Users/student/hrsf84-chatterbox-client/client/index.html?username=chris%20&%20james
-        var url = new URL(window.location.href);
-        var username = url.searchParams.get('username');
-        var message = {
-          username: username,
-          text: e.target.value,
-          roomname: ''
-        };
+        var message = this.createMessage(e.target.value); 
+        console.log(message);       
         this.send(message);
+        $('#message').val('');
       }
     });
+    
+    $('#chats').on('click', '.username', (e) => {
+      this.handleUsernameClick(e);
+    });
+    
+    $('#send .submit').on('submit', (e) => {
+      e.preventDefault();
+      this.handleSubmit(e);
+    });
+    
+    $('#roomSelect').on('change', (e) => {
+      $('#chats').empty();
+      this.fetch();
+    });
+    
   },
   
   fetch: function() {
@@ -37,16 +50,52 @@ var app = {
       type: 'GET',
       success: data => {
         data.results.forEach(message => {
+          this.findRooms(message);
+        });
+        this.addRooms();
+        var currentRoom = $('#roomSelect').val();
+        var messages = data.results.filter(val => {
+          return val.roomname === currentRoom;
+        });
+        messages.forEach(message => {
           this.renderMessage(message);
         });
       }
     });
   },
   
+  addRooms: function() {
+    var html = '';
+    this.rooms.forEach(room => {
+      html += `<option name=${room}>${room}</option>`;
+      this.rooms.push(room);
+    });
+    $('#roomSelect').append(html);
+  },
+  
+  findRooms: function(message) {
+    if (this.rooms.indexOf(message.roomname) === -1 && message.roomname) {
+      this.rooms.push(message.roomname);
+    }
+  },
+  
+  
+  createMessage: function(text) {
+    var url = new URL(window.location.href);
+    var username = url.searchParams.get('username');
+    var message = {
+      username: 'chris',
+      text,
+      roomname: ''
+    };
+    return message;
+  },
+  
   send: function(message) {
+    console.log('sendMSG', message);
     $.ajax({
       type: 'POST',
-      data: JSON.stringify(message),
+      data: message,
       success: function (data) {
         console.log('chatterbox: Message sent');
       },
@@ -62,7 +111,10 @@ var app = {
   },
   
   renderMessage: function(message) {
-    var html = `<div class="message">${message.username}: ${message.text}</div>`;
+    var html = `<div class="messageContainer">
+    <div class="username">${message.username}</div>
+    <div class="contents">${message.text}</div>
+    </div>`;
     $('#chats').append(html);
   },
   
@@ -72,10 +124,15 @@ var app = {
   },
   
   handleSubmit: function() {
-    
+    var message = this.createMessage($('#messageInput').val());
+    this.send(message);
+    $('#message').val('');
   },
   
   handleUsernameClick: function(e) {
-    
+    if (this.friends.indexOf(e.target.innerText) === -1) {
+      this.friends.push(e.target.innerText);
+      console.log(this.friends); 
+    }
   }
 };

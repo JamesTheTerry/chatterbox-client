@@ -26,12 +26,15 @@
   <body>
     <div id="main">
       <h1>chatterbox</h1>
-      <!-- Your HTML goes here! -->
-      <button id="fetchMessages">Fetch Messages</button>
-      <input type="text" name="messageInput" id="messageInput"></input>
-      <select id="roomSelect">
-        
-      </select>
+      <div style='margin-bottom: 30px;'>
+        Room
+        <select id="roomSelect"></select>
+      </div>
+      <!-- <button id="fetchMessages">Fetch Messages</button> -->
+      <input type="text" name="messageInput" id="message"></input>
+      <form id="send" class="submit">
+        <input class="submit" type="submit"></input>
+      </form>
     </div>
     
     <div id="chats"></div>
