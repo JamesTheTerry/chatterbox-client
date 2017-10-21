@@ -87,6 +87,7 @@ var app = {
     }
     
     var html = `<div id=${message.objectId} class="messageContainer">
+    <div class="time">${moment(message.createdAt).format('MM/DD hh:mma')}</div>
     <div class="${usernameClasses}"></div>
     <div class="${messageClasses}"></div>
     </div>`;
